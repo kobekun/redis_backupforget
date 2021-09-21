@@ -1,0 +1,40 @@
+
+是否支持控制台导出RDB格式的Redis备份文件？
+	Redis3.0实例
+		Redis3.0是通过AOF文件持久化的，控制台仅支持备份和下载AOF文件，RDB格式文件可以通过Redis-cli导出：
+		redis-cli -h {redis_address} -p 6379 [-a password] --rdb {output.rdb}
+	Redis4.0和Redis5.0实例
+		Redis4.0/5.0实例支持选择AOF和RDB格式进行持久化，支持在控制台备份和下载RDB文件。？？？(在控制台备份下载不了AOF文件)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

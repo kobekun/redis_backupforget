@@ -1,0 +1,106 @@
+Redis集群可以读取每个节点的IP地址吗？
+	Redis 3.0版本的集群实例（Proxy版本）的使用方式与单机、主备实例相同，无需知晓后端地址。
+	Redis 4.0&5.0版本的集群实例（Cluster版本）可以使用cluster nodes命令获取。
+	redis-cli -h {redis_address} -p {redis_port} -a {redis_password} cluster nodes
+	
+DCS Redis4.0支持的新特性说明
+	新命令的增加，如MEMORY、SWAPDB。
+	Lazyfree机制，延迟删除大key，降低删除操作对系统资源的占用影响。
+	内存性能优化，即主动碎片整理。
+	127.0.0.1:6379[8]> set dcs "DCS is an online, distributed, in-memory cache service compatible with Redis, and Memcached."
+	OK
+	127.0.0.1:6379[8]> memory usage dcs
+	(integer) 141
+	127.0.0.1:6379[8]> 
+	https://support.huaweicloud.com/dcs_faq/Redis4-newfeature.html *****
+	
+使用Cluster的Redis集群时建议配置合理的超时时间
+	https://support.huaweicloud.com/dcs_faq/dcs-faq-210409003.html ****
+
+Redis实例能否修改VPC和子网？
+	实例的VPC和子网，创建后不允许修改。如果要修改，请重新创建实例，在创建时选择指定的VPC和子网。如果实例已有数据需要迁移，可在创建实例之后，使用数据迁移进行迁移。
+
+使用Redis实例的发布订阅(pubsub)有哪些注意事项？
+	使用Redis发布订阅功能时有如下事项请注意：
+
+		1、客户端需要及时消费和处理消息。
+		客户端订阅了channel之后，如果接收消息不及时，可能导致DCS实例消息堆积，当达到消息堆积阈值（默认值为32MB），或者达到某种程度（默认8MB）一段时间（默认为1分钟）后，服务器端会自动断开该客户端连接，避免导致内部内存耗尽。
+
+		2、客户端需要支持重连。
+		当连接断开之后，客户端需要使用subscribe或者psubscribe重新进行订阅，否则无法继续接收消息。
+
+		3、不建议用于消息可靠性要求高的场景中。
+		Redis的pubsub不是一种可靠的消息系统。当出现客户端连接退出，或者极端情况下服务端发生主备切换时，未消费的消息会被丢弃。
+	
+不同编程语言如何使用Cluster集群客户端
+	Cluster集群与Proxy集群差异以及 Cluster集群客户端见：https://support.huaweicloud.com/dcs_faq/dcs-faq-210409002.html
+	
+按需实例转包周期失败是什么原因？	
+	可能原因：实例资源不是“运行中”。
+	只有当实例处于“运行中”状态，才能执行转包周期操作。
+	
+按需实例转包周期需要停服么？
+	按需实例转包周期不中断业务，仅计费方案变更，不会涉及实例资源的重启操作。
+实例无法删除是什么原因？
+	可能原因如下：
+	1、实例资源为包周期实例。
+	包周期的实例不支持删除操作，界面没有“删除”按钮，用户需要执行“退订”操作，退订实例资源。
+	2、实例资源不是“运行中”。
+	只有当实例处于“运行中”状态，才能执行删除操作。
+	3、确认实例是否为创建失败的实例。
+	如果是创建失败的实例，必须单击“创建失败任务”后的图标或者数量，进入“创建失败任务”界面，进行实例删除。
+	
+Redis key丢失是什么原因
+	redis软件是不会主动丢失数据的，key丢失一般有这几种情况：1、key过期；2、key被逐出；3、key被删除。
+	按照顺序进行排查：
+	1、查看key是否过期。
+	2、查看监控，分析是否会触发键逐出机制。
+	3、去服务端分析info查看是否有删除key的操作。
+	
+Proxy集群使用多DB限制
+	https://support.huaweicloud.com/dcs_faq/dcs-faq-210804001.html
+
+命令兼容性
+	如何清空Redis数据？
+		https://support.huaweicloud.com/dcs_faq/dcs-faq-0427051.html
+	如何在Redis中查找匹配的Key和遍历所有Key？
+		查找匹配的key
+			在大Key和热Key分析中，不支持按照指定格式分析，如果需要查找指定前缀或者后缀格式的Key，您可以使用scan命令，根据指定格式进行匹配查找。
+			例如，需要查找Redis实例中包含a关键字的Key，可以使用Redis-cli工具，执行以下命令：
+			./redis-cli -h {redis_address} -p {port} [-a password] --scan --pattern '*a*'	
+		遍历所有Key
+			由于keys命令复杂度高，容易导致Redis无响应，所以禁止使用keys命令遍历实例所有的Key。如果需要在Redis实例中遍历所有的Key，可以使用Redis-cli工具，执行以下命令可以遍历Redis实例的所有key。
+			./redis-cli -h {redis_address} -p {port} [-a password] --scan --pattern '*'
+			scan命令的使用方法，见：https://redis.io/commands/scan
+	Redis命令执行失败的可能原因
+		https://support.huaweicloud.com/dcs_faq/dcs-faq-0427055.html
+	
+	在WebCli执行keys命令报错“permission denied”
+		WebCli已禁用keys命令，请使用Redis-cli执行。
+	
+	高危命令如何重命名？
+		当前支持重命名Redis4.0和Redis5.0实例高危命令command、keys、flushdb、flushall和hgetall，其他命令暂不支持重命名。
+		您可以在购买实例时进行重命名以上高危命令，或者在实例购买之后，在控制台通过“命令重命名”功能修改，重命名后需要重启实例才生效。
+	
+	是否支持pipeline命令？
+		支持。
+		注意：Redis 4.0&5.0 Cluster版本集群实例使用pipeline时，要确保管道中的命令都能在同一分片执行。
+	
+	Redis命令执行不生效
+		如果客户端代码业务异常，怀疑是Redis命令不生效，则可以通过Redis-cli命令进行命令执行和数据查看，判断Redis命令执行是否异常。
+		https://support.huaweicloud.com/dcs_faq/dcs-faq-0427056.html
+	Redis命令执行是否有超时时间？超时了会出现什么结果？
+		Redis命令超时分为客户端超时和服务端超时。
+		1、客户端超时时间一般由客户端代码自行控制，业务侧需要根据自己的业务特点选择合适的超时时间（例如Java的Lettuce客户端，该参数名为timeout）。
+		2、Redis服务端Timeout默认配置为0，不会主动断开连接，如果需要修改配置，可以参考修改实例配置参数。
+	
+	Redis的Key是否能设置为大小写不敏感？
+		华为云Redis和开源Redis保持一致，key对大小写敏感，且不支持设置大小写不敏感功能。
+	
+	Redis是否支持查看使用次数最多的命令？
+		Redis不支持对历史命令的记录，也不支持查看使用次数最多的命令。
+	
+	怎么放通SYNC和PSYNC命令？
+		默认情况下，一般云厂商都是禁用了SYNC和PSYNC命令，如果要放通，需要联系云厂商运维人员放通命令。华为云DCS服务之间进行迁移，如果是同一帐号相同Region进行在线迁移，在执行迁移时，会自动放通SYNC和PSYNC命令；如果是不同Region或相同Region不同帐号进行在线迁移，
+		不支持放通SYNC和PSYNC命令，无法使用在线迁移，推荐使用备份文件导入方式迁移。
+	

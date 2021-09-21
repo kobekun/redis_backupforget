@@ -1,0 +1,77 @@
+
+实例是否支持变更可用区
+	支持，可通过在线迁移+IP交换的方式，进行可用区的变更，具体操作可参考 https://support.huaweicloud.com/usermanual-dcs/dcs-ug-210820001.html
+
+DCS实例是否支持跨可用区部署？
+	Redis主备/集群/读写分离实例、Memcached主备实例支持跨可用区（AZ）部署。 保持高可用
+
+什么是哨兵？
+	https://support.huaweicloud.com/dcs_faq/dcs-faq-210707001.html
+
+Redis实例是否支持哨兵模式？
+	1、Redis4.0和Redis5.0主备实例支持使用哨兵模式（Sentinel）进行管理，Sentinel会一直监控主备节点是否正常运行，当主节点出现故障时，进行主备倒换。
+	Sentinel对用户不可见，仅在服务内部中使用。
+
+	2、Redis3.0不支持哨兵模式，使用的是keeplived进行监控，当主节点故障时进行主备切换，备节点自动接管服务。
+
+DCS实例规格变更是否需要关闭或重启实例？
+	实例处于运行中的状态即可进行规格变更，不会涉及实例资源的重启操作。
+
+Redis单机实例能否变更为主备或集群？
+	Redis 3.0：单机实例可变更为主备实例，主备实例可变更为Proxy集群实例。
+	Redis 4.0&5.0：暂不支持变更实例类型。
+
+	实例类型是否支持变更，以控制台实例的“变更规格”操作界面为准。
+
+DCS实例规格变更的业务影响
+	https://support.huaweicloud.com/dcs_faq/dcs-faq-0427064.html
+
+Redis/Memcached实例变更失败的原因
+	https://support.huaweicloud.com/dcs_faq/dcs-faq-0427065.html
+	1、检查是否有其他任务在执行。
+	2、如果是主备变更为Proxy集群，请确认主备实例DB0以外的DB是否有数据，如果非DB0外的其他DB上有数据（如DB1有数据），会出现变更失败。
+	数据必须是只存储在DB0上的主备实例才支持变更为Proxy集群。
+
+DCS集群实例如何缩容？
+	https://support.huaweicloud.com/dcs_faq/dcs-faq-0427066.html
+
+Arm和x86如何选择
+	https://support.huaweicloud.com/dcs_faq/dcs-faq-0515001.html
+
+是否支持CPU架构的变更？
+	支持，可通过在线迁移+IP交换的方式，进行CPU架构的变更，具体操作可参考 https://support.huaweicloud.com/usermanual-dcs/dcs-ug-210820001.html
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
